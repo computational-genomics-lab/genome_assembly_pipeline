@@ -1,0 +1,21 @@
+# Modify the given path for input and output files at the required positions. The path /home/sutripa/pass/... is mentioned as an example.
+rule all:
+    input:
+        "/home/sutripa/pass/nanoqc_result"
+# Merging of the raw long read sequencing data, rawfile1 and rawfile2. More number of raw files can be added after rawfile2
+rule merge:
+    input:
+        rawfile1="/home/sutripa/pass/nanoread_3.fastq.gz",
+        rawfile2="/home/sutripa/pass/nanoread_4.fastq.gz"
+    output:
+        merge="/home/sutripa/pass/merged.fastq.gz",
+    shell:
+        "cat {input.rawfile1} {input.rawfile2} > {output}"
+# Quality control check for the merged raw read sequencing data using nanoQC       
+rule qc:
+    input:
+        merge="/home/sutripa/pass/merged.fastq.gz"
+    output:
+        "/home/sutripa/pass/nanoqc_result"
+    shell:
+        "nanoQC {input.merge} -o {output}"

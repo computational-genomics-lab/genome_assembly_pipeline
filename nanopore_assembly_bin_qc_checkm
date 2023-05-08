@@ -1,0 +1,60 @@
+# Modify the given path for input and output files at the required positions. The path /home/sutripa/pass/... is mentioned as an example.
+rule all:
+    input:
+        "/home/sutripa/pass/Flye_res/checkm_output_aftermetabat"
+# Merging of the raw long read sequencing data, rawfile1 and rawfile2. More number of raw files can be added after rawfile2
+rule merge:
+    input:
+        rawfile3="/home/sutripa/pass/fastq_runid_74acb6d6dc4984936237e97b69ec819791dd5188_3.fastq.gz",
+        rawfile4="/home/sutripa/pass/fastq_runid_74acb6d6dc4984936237e97b69ec819791dd5188_4.fastq.gz",
+        rawfile5="/home/sutripa/pass/fastq_runid_74acb6d6dc4984936237e97b69ec819791dd5188_5.fastq.gz",
+        rawfile6="/home/sutripa/pass/fastq_runid_74acb6d6dc4984936237e97b69ec819791dd5188_6.fastq.gz",
+        rawfile7="/home/sutripa/pass/fastq_runid_74acb6d6dc4984936237e97b69ec819791dd5188_7.fastq.gz",
+        rawfile8="/home/sutripa/pass/fastq_runid_74acb6d6dc4984936237e97b69ec819791dd5188_8.fastq.gz",
+        rawfile9="/home/sutripa/pass/fastq_runid_74acb6d6dc4984936237e97b69ec819791dd5188_9.fastq.gz",
+        rawfile27="/home/sutripa/pass/fastq_runid_74acb6d6dc4984936237e97b69ec819791dd5188_27.fastq.gz",
+        rawfile28="/home/sutripa/pass/fastq_runid_74acb6d6dc4984936237e97b69ec819791dd5188_28.fastq.gz",
+        rawfile29="/home/sutripa/pass/fastq_runid_74acb6d6dc4984936237e97b69ec819791dd5188_29.fastq.gz",
+    output:
+        merged="/home/sutripa/pass/merged.fastq.gz",
+    shell:
+        "cat {input.rawfile3} {input.rawfile4} {input.rawfile5} {input.rawfile6} {input.rawfile7} {input.rawfile8} {input.rawfile9} {input.rawfile27} {input.rawfile28} {input.rawfile29} > {output.merged}"
+# Quality-trimming and filtering of the raw reads using nanofilt
+rule filter:
+    input:
+        merged="/home/sutripa/pass/merged.fastq.gz"
+    output:
+        filtered="/home/sutripa/pass/highQuality-reads.fastq"
+    shell:
+        "gunzip -c {input.merged} | NanoFilt -q 10 --headcrop 40 --tailcrop 10 --minGC 0.33 --maxGC 0.54 > {output.filtered}"
+# Production of polished contigs through assembly of cleaned read sequencing data using flye 
+rule assembly:
+    input:
+        filtered="/home/sutripa/pass/highQuality-reads.fastq"
+    output:
+        touch('/home/sutripa/pass/Flye_res/assembly.fasta'),
+        outdir="/home/sutripa/pass/Flye_res",
+    shell:
+        "flye --nano-raw {input.filtered} --out-dir {output.outdir} --threads
+# Binning of the assembled genome to check the lineage of the contigs
+rule binning:
+    conda:  "new-env.yaml"
+    input:
+        assem="/home/sutripa/pass/Flye_res/assembly.fasta",
+    output:
+        touch('bin.done'),
+    params:
+        index_prefix='bin_',
+    shell:
+        "metabat2 -i {input.assem} -o {params.index_prefix}"
+# Assesment of completeness and contamination of the obtained bins in the assembled genome through checkm
+rule assembly_checkm_afterbin:
+    conda:   "new-env.yaml"
+    input:
+        "bin.done",
+        indir="/home/sutripa/pass"
+    output:
+        "/home/sutripa/pass/Flye_res/checkm_output_aftermetabat"
+    shell:
+        "checkm lineage_wf -t 8 -x fa {input.indir} {output} --pplacer_thread 30 2>&1 | tee checkm.log"        
+        

@@ -1,0 +1,15 @@
+# Modify the given path for input and output files at the required positions. The path /home/sutripa/pass/... is mentioned as an example.
+rule all:
+    input:
+        qc_R1="/home/sutripa/pass/illumina_reads/268_PE_R1_fastqc.html",
+        qc_R2="/home/sutripa/pass/illumina_reads/268_PE_R2_fastqc.html"
+# Quality control check for the raw read sequencing data using fastqc
+rule qc:
+    input:
+        rawfile1="/home/sutripa/pass/illumina_reads/268_PE_R1.fastq.gz",
+        rawfile2="/home/sutripa/pass/illumina_reads/268_PE_R2.fastq.gz"
+    output:
+        qc_R1="/home/sutripa/pass/illumina_reads/268_PE_R1_fastqc.html",
+        qc_R2="/home/sutripa/pass/illumina_reads/268_PE_R2_fastqc.html"
+    shell:
+        "fastqc {input.rawfile1} {input.rawfile2}"

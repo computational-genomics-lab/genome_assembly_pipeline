@@ -1,0 +1,51 @@
+# Modify the given path for input and output files at the required positions. The path /home/sutripa/... is mentioned as an example. 
+rule all:
+    input:
+        "busco_output_afterpolypolish"
+rule index:
+    input:
+        consense="/home/sutripa/pass/illumina_reads/consensus.fasta",
+    output:
+        touch('index.done'),
+    params:
+        index_prefix='consensus.fasta',
+    shell:
+        "bwa index -p {params.index_prefix} {input.consense}"
+rule alignment:
+    input:
+        idx=('index.done'),
+        cleaned_R1="268_cleaned_R1.fq",
+        cleaned_R2="268_cleaned_R2.fq"
+    params:
+        index_prefix='consensus.fasta',
+    output:
+        ali1="alignment_1.sam",
+        ali2="alignment_2.sam"
+    run:
+        shell("bwa mem -t 16 -a {params.index_prefix} {input.cleaned_R1} > {output.ali1}")
+        shell("bwa mem -t 16 -a {params.index_prefix} {input.cleaned_R1} > {output.ali2}")
+rule polypolish_filter:
+    input:
+        ali1="alignment_1.sam",
+        ali2="alignment_2.sam"
+    output:
+        filt1="filter1.sam",
+        filt2="filter2.sam"
+    shell:
+        "/home/sutripa/Polypolish/scripts/polypolish_insert_filter.py --in1 {input.ali1} --in2 {input.ali2} --out1 {output.filt1} --out2 {output.filt2}"
+rule polypolish_consense:
+    input:
+        consense="/home/sutripa/pass/illumina_reads/consensus.fasta",
+        filt_ali1="filter1.sam",
+        filt_ali2="filter2.sam"
+    output:
+        "polypolish.fasta"
+    shell:
+        "/home/sutripa/Polypolish/target/release/polypolish {input.consense} {input.filt_ali1} {input.filt_ali2} > {output}"
+rule busco_check:
+    input:
+        "polypolish.fasta"
+    output:
+        "busco_output_afterpolypolish"
+    shell:
+        "busco -i {input} -l cyanobacteria_odb10 -o {output} -m genome"

@@ -1,0 +1,25 @@
+# Modify the given path for input and output files at the required positions. The path /home/sutripa/pass/... is mentioned as an example.
+rule all:
+    input:
+        qc_cleanR1="/home/sutripa/pass/illumina_reads/268_cleaned_R1_fastqc.html",
+        qc_cleanR2="/home/sutripa/pass/illumina_reads/268_cleaned_R2_fastqc.html"
+# Quality-trimming, filtering and adapter-trimming of the raw read sequencing data using bbduk. More number of raw files can be added after rawfile2.
+rule readclean:
+    input:
+        rawfile1="/home/sutripa/pass/illumina_reads/268_PE_R1.fastq.gz",
+        rawfile2="/home/sutripa/pass/illumina_reads/268_PE_R2.fastq.gz"
+    output:
+        clean1="/home/sutripa/pass/illumina_reads/268_cleaned_R1.fq",
+        clean2="/home/sutripa/pass/illumina_reads/268_cleaned_R2.fq"
+    shell:
+        "bbduk.sh in1={input.rawfile1} in2={input.rawfile2} out1={output.clean1} out2={output.clean2} ftl=9 minlength=75 ref=/home/sutripa/heatShock/adapters.fasta.gz ktrim=r k=23 mink=11 hdist=1 tpe tbo"
+# Quality control check for the raw read sequencing data using fastqc
+rule qc_afterclean:
+    input:
+        cleanfile1="/home/sutripa/pass/illumina_reads/268_cleaned_R1.fq",
+        cleanfile2="/home/sutripa/pass/illumina_reads/268_cleaned_R2.fq"
+    output:
+        qc_cleanR1="/home/sutripa/pass/illumina_reads/268_cleaned_R1_fastqc.html",
+        qc_cleanR2="/home/sutripa/pass/illumina_reads/268_cleaned_R2_fastqc.html"
+    shell:
+        "fastqc {input.cleanfile1} {input.cleanfile2}"
