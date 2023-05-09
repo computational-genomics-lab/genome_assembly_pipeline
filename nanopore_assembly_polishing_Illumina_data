@@ -1,9 +1,9 @@
-# This pipeline is for polishing draft genome assembly of long reads with short reads
+# This pipeline is for short-read polishing on long-read assemblies
 # Modify the given path for input and output files at the required positions. The path /home/sutripa/... is mentioned as an example. 
 rule all:
     input:
         "busco_output_afterpolypolish"
-# indexing of the consensus draft genome assembly using bwa index (consensus.fasta, obtained from the pipeline "nanopore_assembly_bin_consensus")
+# indexing of the consensus long read genome assembly (draft assembly) using bwa index (consensus.fasta, obtained from the pipeline "nanopore_assembly_bin_consensus")
 rule index:
     input:
         consense="/home/sutripa/pass/illumina_reads/consensus.fasta",
@@ -13,7 +13,7 @@ rule index:
         index_prefix='consensus.fasta',
     shell:
         "bwa index -p {params.index_prefix} {input.consense}"
-# alignment of the cleaned illumina sequencing reads (R1 and R2) to all possible locations of the indexed consensus genome assembly 
+# alignment of the cleaned paired end short sequencing reads (R1 and R2) to all possible locations of the indexed consensus long read draft genome assembly, individual sam files will be genearted 
 rule alignment:
     input:
         idx=('index.done'),
@@ -27,7 +27,7 @@ rule alignment:
     run:
         shell("bwa mem -t 16 -a {params.index_prefix} {input.cleaned_R1} > {output.ali1}")
         shell("bwa mem -t 16 -a {params.index_prefix} {input.cleaned_R1} > {output.ali2}")
-# reducing excess alignment, based on their insert size particularly near the edges of the repeat sequences to improve accuracy of polypolish (following step)   
+# filtering the alignments by reducing excess alignment, based on their insert size particularly near the edges of the repeat sequences to improve accuracy of polypolish (following step)   
 rule polypolish_filter:
     input:
         ali1="alignment_1.sam",
@@ -37,7 +37,7 @@ rule polypolish_filter:
         filt2="filter2.sam"
     shell:
         "/home/sutripa/Polypolish/scripts/polypolish_insert_filter.py --in1 {input.ali1} --in2 {input.ali2} --out1 {output.filt1} --out2 {output.filt2}"
-# 
+# draft genome and the alignments (filtered sam files) are given to Polypolish which will output information to stderr and the polished assembly to stdout, so redirect its output to a file:
 rule polypolish_consense:
     input:
         consense="/home/sutripa/pass/illumina_reads/consensus.fasta",
@@ -47,6 +47,7 @@ rule polypolish_consense:
         "polypolish.fasta"
     shell:
         "/home/sutripa/Polypolish/target/release/polypolish {input.consense} {input.filt_ali1} {input.filt_ali2} > {output}"
+# Quantitative assessment of the polished genome assembly through busco. polypolish.fasta is written as an example.                
 rule busco_check:
     input:
         "polypolish.fasta"
