@@ -2,6 +2,7 @@
 rule all:
     input:
         "busco_output_afterpolypolish"
+# indexing of the consensus draft genome assembly using bwa index (consensus.fasta, obtained from ...)
 rule index:
     input:
         consense="/home/sutripa/pass/illumina_reads/consensus.fasta",
@@ -11,6 +12,7 @@ rule index:
         index_prefix='consensus.fasta',
     shell:
         "bwa index -p {params.index_prefix} {input.consense}"
+# alignment of the cleaned illumina sequencing reads (R1 and R2) to the indexed consensus genome assembly 
 rule alignment:
     input:
         idx=('index.done'),
@@ -24,6 +26,7 @@ rule alignment:
     run:
         shell("bwa mem -t 16 -a {params.index_prefix} {input.cleaned_R1} > {output.ali1}")
         shell("bwa mem -t 16 -a {params.index_prefix} {input.cleaned_R1} > {output.ali2}")
+
 rule polypolish_filter:
     input:
         ali1="alignment_1.sam",
