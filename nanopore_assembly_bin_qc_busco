@@ -36,7 +36,7 @@ rule assembly:
         outdir="/home/sutripa/pass/Flye_res",
     shell:
         "flye --nano-raw {input.filtered} --out-dir {output.outdir} --threads 40"
-# Binning of the long read draft genome assembly to check the lineage of the contigs. Pipeline "nanopore_assembly_bin_qc_checkm" gives the statistics of different bins. The appropriate bin name (bin_.2.fa) is written as an output here. 
+# Binning of the long read draft genome assembly to check the lineage of the contigs using metabat2. Pipeline "nanopore_assembly_bin_qc_checkm" gives the statistics of different bins. The appropriate bin name (bin_.2.fa) is written as an output here. 
 rule binning:
     conda:  "new-env.yaml"
     input:
