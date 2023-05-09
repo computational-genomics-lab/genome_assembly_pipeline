@@ -11,7 +11,7 @@ rule merge:
         merge="/home/sutripa/pass/merged.fastq.gz",
     shell:
         "cat {input.rawfile1} {input.rawfile2} > {output}"
-# Quality control check for the merged raw read sequencing data using nanoQC       
+# Quality control check for the merged raw long read sequencing data using nanoQC       
 rule qc:
     input:
         merge="/home/sutripa/pass/merged.fastq.gz"
