@@ -13,7 +13,7 @@ rule index:
         index_prefix='consensus.fasta',
     shell:
         "bwa index -p {params.index_prefix} {input.consense}"
-# Alignment of the cleaned paired end short sequencing reads (R1 and R2) to all possible locations of the indexed consensus long read draft genome assembly. Individual sam files will be genearted 
+# Alignment of the cleaned paired end short sequencing reads (R1 and R2) to all possible locations of the indexed consensus long read draft genome assembly using bwa mem. Individual sam files will be genearted 
 rule alignment:
     input:
         idx=('index.done'),
@@ -27,7 +27,7 @@ rule alignment:
     run:
         shell("bwa mem -t 16 -a {params.index_prefix} {input.cleaned_R1} > {output.ali1}")
         shell("bwa mem -t 16 -a {params.index_prefix} {input.cleaned_R1} > {output.ali2}")
-# Filtering the alignments by reducing excess alignment, based on their insert size particularly near the edges of the repeat sequences to improve accuracy of polypolish (following step)   
+# Filtering the alignments by reducing excess alignment, based on their insert size particularly near the edges of the repeat sequences to improve accuracy of polypolish (following step) using polypolish_insert_filter.py   
 rule polypolish_filter:
     input:
         ali1="alignment_1.sam",
@@ -37,7 +37,7 @@ rule polypolish_filter:
         filt2="filter2.sam"
     shell:
         "/home/sutripa/Polypolish/scripts/polypolish_insert_filter.py --in1 {input.ali1} --in2 {input.ali2} --out1 {output.filt1} --out2 {output.filt2}"
-# Long read draft genome assembly and the alignments (filtered sam files) are given to Polypolish which will output information to stderr and the polished assembly to stdout, so redirect its output to a file:
+# Long read draft genome assembly and the alignments (filtered sam files) are given to Polypolish which will output information to stderr and the polished assembly to stdout, so redirect its output to a file using polypolish:
 rule polypolish_consense:
     input:
         consense="/home/sutripa/pass/illumina_reads/consensus.fasta",
