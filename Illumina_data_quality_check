@@ -3,7 +3,7 @@ rule all:
     input:
         qc_R1="/home/sutripa/pass/illumina_reads/268_PE_R1_fastqc.html",
         qc_R2="/home/sutripa/pass/illumina_reads/268_PE_R2_fastqc.html"
-# Quality control check for the raw read sequencing data (R1 and R2) using fastqc
+# Quality control check for the raw short read paired-end sequencing data (R1 and R2) using fastqc
 rule qc:
     input:
         rawfile1="/home/sutripa/pass/illumina_reads/268_PE_R1.fastq.gz",
