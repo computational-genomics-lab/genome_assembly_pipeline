@@ -11,7 +11,7 @@ rule merge:
         merged="/home/sutripa/pass/merged.fastq.gz",
     shell:
         "cat {input.rawfile1} {input.rawfile2} > {output.merged}"
-# Quality-trimming and filtering of the merged raw reads using nanofilt
+# Quality-trimming and filtering of the merged raw long reads using nanofilt
 rule filter:
     input:
         merged="/home/sutripa/pass/merged.fastq.gz"
@@ -19,7 +19,7 @@ rule filter:
         filtered="/home/sutripa/pass/highQuality-reads.fastq"
     shell:
         "gunzip -c {input.merged} | NanoFilt -q 10 --headcrop 40 --tailcrop 10 --minGC 0.33 --maxGC 0.54 > {output.filtered}"
-# Production of polished contigs through assembly of cleaned read sequencing data using flye 
+# Production of polished contigs through assembly of cleaned long read sequencing data using flye 
 rule assembly:
     input:
         filtered="/home/sutripa/pass/highQuality-reads.fastq"
@@ -27,7 +27,7 @@ rule assembly:
         "/home/sutripa/pass/Flye_res"
     shell:
         "flye --nano-raw {input.filtered} --out-dir {output} --threads 40"
-# Assesment of completeness and contamination of the assembled genome in checkm
+# Assesment of completeness and contamination of the long read draft assembled genome in checkm
 rule assembly_checkm:
      conda:  "new-env.yaml"
      input:
