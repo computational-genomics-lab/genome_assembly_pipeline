@@ -36,7 +36,7 @@ rule assembly:
         outdir="/home/sutripa/pass/Flye_res",
     shell:
         "flye --nano-raw {input.filtered} --out-dir {output.outdir} --threads
-# Binning of the assembled draft genome to check the lineage of the contigs
+# Binning of the long read draft genome assembly to check the lineage of the contigs
 rule binning:
     conda:  "new-env.yaml"
     input:
@@ -47,7 +47,7 @@ rule binning:
         index_prefix='bin_',
     shell:
         "metabat2 -i {input.assem} -o {params.index_prefix}"
-# Assesment of completeness and contamination of the obtained bins in the assembled draft genome through checkm
+# Assesment of completeness and contamination of the obtained bins in the long read draft genome assembly through checkm
 rule assembly_checkm_afterbin:
     conda:   "new-env.yaml"
     input:
