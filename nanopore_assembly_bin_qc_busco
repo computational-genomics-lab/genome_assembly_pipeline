@@ -48,7 +48,7 @@ rule binning:
         index_prefix='bin_',
     shell:
         "metabat2 -i {input.assem} -o {params.index_prefix}"
-# Quantitative assessment of the appropriate bin (found in "nanopore_assembly_bin_qc_checkm" pipeline) in the assembled draft genome through busco. bin_2.fa is written as an example.
+# Quantitative assessment of the appropriate bin (found in "nanopore_assembly_bin_qc_checkm" pipeline) in the long read draft genome assembly through busco. bin_2.fa is written as an example.
 rule busco_check:
     input:
         inbin="bin_.2.fa"
