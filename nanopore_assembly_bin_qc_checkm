@@ -19,7 +19,7 @@ rule merge:
         merged="/home/sutripa/pass/merged.fastq.gz",
     shell:
         "cat {input.rawfile3} {input.rawfile4} {input.rawfile5} {input.rawfile6} {input.rawfile7} {input.rawfile8} {input.rawfile9} {input.rawfile27} {input.rawfile28} {input.rawfile29} > {output.merged}"
-# Quality-trimming and filtering of the raw reads using nanofilt
+# Quality-trimming and filtering of the raw long reads using nanofilt
 rule filter:
     input:
         merged="/home/sutripa/pass/merged.fastq.gz"
@@ -27,7 +27,7 @@ rule filter:
         filtered="/home/sutripa/pass/highQuality-reads.fastq"
     shell:
         "gunzip -c {input.merged} | NanoFilt -q 10 --headcrop 40 --tailcrop 10 --minGC 0.33 --maxGC 0.54 > {output.filtered}"
-# Production of polished contigs through assembly of cleaned read sequencing data using flye 
+# Production of polished contigs through assembly of cleaned long read sequencing data using flye 
 rule assembly:
     input:
         filtered="/home/sutripa/pass/highQuality-reads.fastq"
@@ -36,7 +36,7 @@ rule assembly:
         outdir="/home/sutripa/pass/Flye_res",
     shell:
         "flye --nano-raw {input.filtered} --out-dir {output.outdir} --threads
-# Binning of the assembled genome to check the lineage of the contigs
+# Binning of the assembled draft genome to check the lineage of the contigs
 rule binning:
     conda:  "new-env.yaml"
     input:
@@ -47,7 +47,7 @@ rule binning:
         index_prefix='bin_',
     shell:
         "metabat2 -i {input.assem} -o {params.index_prefix}"
-# Assesment of completeness and contamination of the obtained bins in the assembled genome through checkm
+# Assesment of completeness and contamination of the obtained bins in the assembled draft genome through checkm
 rule assembly_checkm_afterbin:
     conda:   "new-env.yaml"
     input:
