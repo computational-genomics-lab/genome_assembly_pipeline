@@ -36,7 +36,7 @@ rule assembly:
         outdir="/home/sutripa/pass/Flye_res",
     shell:
         "flye --nano-raw {input.filtered} --out-dir {output.outdir} --threads 40"
-# Binning of the assembled genome to check the lineage of the contigs 
+# Binning of the assembled genome to check the lineage of the contigs. Pipeline "nanopore_assembly_bin_qc_checkm" gives the statistics of different bins. The appropriate bin name (bin_.2.fa) is written as an output here.
 rule binning:
     conda:  "new-env.yaml"
     input:
@@ -48,7 +48,7 @@ rule binning:
         index_prefix='bin_',
     shell:
         "metabat2 -i {input.assem} -o {params.index_prefix}"
-# Creating a consensus sequence from individual cleaned long sequencing reads (highQuality-reads.fastq) against a draft assembly in the appropriate bin (example: bin_2.fa). 
+# Creating a consensus sequence from individual cleaned long sequencing reads (highQuality-reads.fastq) against a draft assembly in the appropriate bin (example: bin_2.fa, found from "nanopore_assembly_bin_qc_checkm" pipeline)
 rule med_consensus:
     input:
         inbin="bin_.2.fa",
