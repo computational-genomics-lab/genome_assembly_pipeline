@@ -48,7 +48,7 @@ rule binning:
         index_prefix='bin_',
     shell:
         "metabat2 -i {input.assem} -o {params.index_prefix}"
-# Creating a consensus sequence from individual cleaned long sequencing reads (highQuality-reads.fastq) against a draft long read genome assembly in the appropriate bin (example: bin_2.fa, found from "nanopore_assembly_bin_qc_checkm" pipeline)
+# Building a consensus sequence from individual cleaned long sequencing reads (highQuality-reads.fastq) against a draft long read genome assembly in the appropriate bin (example: bin_2.fa, found from "nanopore_assembly_bin_qc_checkm" pipeline)
 rule med_consensus:
     input:
         inbin="bin_.2.fa",
