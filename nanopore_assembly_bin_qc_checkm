@@ -36,7 +36,7 @@ rule assembly:
         outdir="/home/sutripa/pass/Flye_res",
     shell:
         "flye --nano-raw {input.filtered} --out-dir {output.outdir} --threads
-# Binning of the long read draft genome assembly to check the lineage of the contigs
+# Binning of the long read draft genome assembly to check the lineage of the contigs using metabat2 
 rule binning:
     conda:  "new-env.yaml"
     input:
