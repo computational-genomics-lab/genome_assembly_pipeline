@@ -93,6 +93,7 @@ This pipeline will perform polishing of the long read draft genome assembly usin
 9. fastqc
 10. bwa
 11. polypolish
+12. snakemake
 
 # command to run the pipeline
 
