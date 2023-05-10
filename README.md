@@ -81,4 +81,22 @@ This pipeline will perform polishing of the long read draft genome assembly usin
 
 # Modify the given path for input and output files at the required positions in the individual pipeline. The path /home/sutripa/pass/... is mentioned as an example.
 
+# Software/package/tool required to install 
+1. nanoqc
+2. nanofilt
+3. flye
+4. checkm
+5. metabat2
+6. busco
+7. medaka
+8. bbduk
+9. fastqc
+10. bwa
+11. polypolish
+
+# command to run the pipeline
+
+snakemake --snakefile filename --core 40
+
+
 
